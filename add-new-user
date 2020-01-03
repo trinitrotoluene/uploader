@@ -12,7 +12,7 @@ args = parser.parse_args()
 users = None
 with open(args.file, "r") as userfile:
     users = json.load(userfile)
-    users[str(uuid.uuid4())] = args.user
+    users[str(uuid.uuid4())] = args.name
 
 if not users == None:
     with open(args.file, "w") as userfile:
