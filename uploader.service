@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance serving the image uploader
+After=network.target
+
+[Service]
+User=uploader
+Group=www-data
+WorkingDirectory=/mnt/hdd0/uploader
+Environment="PATH=/mnt/hdd0/appenv/bin"
+ExecStart=/mnt/hdd0/appenv/bin/uwsgi --ini app.ini
+
+[Install]
+WantedBy=multi-user.target
