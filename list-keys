@@ -2,24 +2,22 @@
 import argparse
 import uuid
 import json
+import os
 
-parser = argparse.ArgumentParser(description="Revokes a target key")
-parser.add_argument("-k", "--key", type=str)
+parser = argparse.ArgumentParser(description="Lists ")
+parser.add_argument("-n", "--name", type=str)
 parser.add_argument("-f", "--file", type=str, default="keys.json")
 
 args = parser.parse_args()
 
 def get_user_file(path):
     try:
-        with open(path, "r+") as target_file:
+        with open(path, "r") as target_file:
             return target_file
     except:
         return None
 
-def unregister_key(key, dictionary):
-    return dictionary.pop(key)
-
-def revoke_key():
+def list_keys():
     userfile = get_user_file(args.file)
 
     if userfile == None:
@@ -32,16 +30,11 @@ def revoke_key():
     except:
         print("Error: could not parse JSON in {}".format(args.file))
         return
-    
-    name = unregister_key(args.key, userkeys)
 
-    userfile.seek(0)
-    userfile.write(json.dumps(userkeys))
-    userfile.truncate()
+    if userkeys == None:
+        userkeys = {}
 
-    if name == None:
-        print("Error: key not found")
-    else:
-        print("Revoked key '{}' with owner '{}'".format(args.key, name))
+    for key in userkeys.keys():
+        print("{}:{}".format(key, userkeys[key]))
 
-revoke_key()
+list_keys()

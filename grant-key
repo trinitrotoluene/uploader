@@ -4,7 +4,7 @@ import uuid
 import json
 import os
 
-parser = argparse.ArgumentParser(description="Generates a new key-user pair and write it to a target keyfile")
+parser = argparse.ArgumentParser(description="Generates a new key-user pair and writes it to the keyfile")
 parser.add_argument("-n", "--name", type=str)
 parser.add_argument("-f", "--file", type=str, default="keys.json")
 
