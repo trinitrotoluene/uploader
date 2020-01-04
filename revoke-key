@@ -1,0 +1,47 @@
+#!/usr/bin/python
+import argparse
+import uuid
+import json
+
+parser = argparse.ArgumentParser(description="Generates a new key-user pair and write it to a target keyfile")
+parser.add_argument("-k", "--key", type=str)
+parser.add_argument("-f", "--file", type=str, default="keys.json")
+
+args = parser.parse_args()
+
+def get_user_file(path):
+    try:
+        with open(path, "r+") as target_file:
+            return target_file
+    except:
+        return None
+
+def unregister_key(key, dictionary):
+    return dictionary.pop(key)
+
+def revoke_key():
+    userfile = get_user_file(args.file)
+
+    if userfile == None:
+        print("Error: could not open {}".format(args.file))
+        return
+    
+    userkeys = None
+    try:
+        userkeys = json.load(userfile)
+    except:
+        print("Error: could not parse JSON in {}".format(args.file))
+        return
+    
+    name = unregister_key(args.key, userkeys)
+
+    userfile.seek(0)
+    userfile.write(json.dumps(userkeys))
+    userfile.truncate()
+
+    if name == None:
+        print("Error: key not found")
+    else:
+        print("Revoked key '{}' with owner '{}'".format(args.key, name))
+
+revoke_key()

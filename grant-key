@@ -1,0 +1,50 @@
+#!/usr/bin/python
+import argparse
+import uuid
+import json
+import os
+
+parser = argparse.ArgumentParser(description="Generates a new key-user pair and write it to a target keyfile")
+parser.add_argument("-n", "--name", type=str)
+parser.add_argument("-f", "--file", type=str, default="keys.json")
+
+args = parser.parse_args()
+
+def get_user_file(path):
+    try:
+        with open(path, "r+") as target_file:
+            return target_file
+    except:
+        return None
+
+def register_new(name, dictionary):
+    key = str(uuid.uuid4())
+    dictionary[key] = name
+    return key
+
+def add_new_user():
+    userfile = get_user_file(args.file)
+
+    if userfile == None:
+        print("Error: could not open {}".format(args.file))
+        return
+    
+    userkeys = None
+    try:
+        userkeys = json.load(userfile)
+    except:
+        if os.fstat(userfile).st_size > 0:
+            print("Error: could not parse JSON in {} and file is not empty".format(args.file))
+            return
+        else:
+            userkeys = {}
+    
+    newkey = register_new(args.name, userkeys)
+
+    userfile.seek(0)
+    userfile.write(json.dumps(userkeys))
+    userfile.truncate()
+
+    print("Added user '{}' with key '{}'".format(args.name, newkey))
+
+add_new_user()
