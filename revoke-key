@@ -11,8 +11,7 @@ args = parser.parse_args()
 
 def get_user_file(path):
     try:
-        with open(path, "r+") as target_file:
-            return target_file
+        return open(path, "r+")
     except:
         return None
 
@@ -20,28 +19,27 @@ def unregister_key(key, dictionary):
     return dictionary.pop(key)
 
 def revoke_key():
-    userfile = get_user_file(args.file)
+    with get_user_file(args.file) as userfile:
+        if userfile == None:
+            print("Error: could not open {}".format(args.file))
+            return
+        
+        userkeys = None
+        try:
+            userkeys = json.load(userfile)
+        except:
+            print("Error: could not parse JSON in {}".format(args.file))
+            return
+        
+        name = unregister_key(args.key, userkeys)
 
-    if userfile == None:
-        print("Error: could not open {}".format(args.file))
-        return
-    
-    userkeys = None
-    try:
-        userkeys = json.load(userfile)
-    except:
-        print("Error: could not parse JSON in {}".format(args.file))
-        return
-    
-    name = unregister_key(args.key, userkeys)
+        userfile.seek(0)
+        userfile.write(json.dumps(userkeys))
+        userfile.truncate()
 
-    userfile.seek(0)
-    userfile.write(json.dumps(userkeys))
-    userfile.truncate()
-
-    if name == None:
-        print("Error: key not found")
-    else:
-        print("Revoked key '{}' with owner '{}'".format(args.key, name))
+        if name == None:
+            print("Error: key not found")
+        else:
+            print("Revoked key '{}' with owner '{}'".format(args.key, name))
 
 revoke_key()
